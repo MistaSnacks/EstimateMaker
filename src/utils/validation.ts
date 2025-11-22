@@ -1,4 +1,4 @@
-import type { Estimate } from '../types/estimate';
+import type { Estimate, LineItem } from '../types/estimate';
 
 export interface ValidationError {
   field: string;
@@ -46,6 +46,6 @@ export function isEstimateComplete(estimate: Partial<Estimate>): boolean {
          (calculateGrandTotal(estimate.lineItems || [])) > 0;
 }
 
-function calculateGrandTotal(items: any[]): number {
+function calculateGrandTotal(items: LineItem[]): number {
   return items.reduce((sum, item) => sum + item.total, 0);
 }

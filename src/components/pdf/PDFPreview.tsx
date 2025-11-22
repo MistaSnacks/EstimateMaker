@@ -1,10 +1,14 @@
 import React from 'react';
 import { useEstimate } from '../../contexts/EstimateContext';
 import { calculateGrandTotal } from '../../utils/calculations';
-import type { Allocation } from '../../types/estimate';
+import type { Allocation, LineItem } from '../../types/estimate';
 
-function groupAllocations(allocations: Allocation[], lineItems: any[]) {
-  const grouped: Record<string, any[]> = {};
+interface AllocationWithDescription extends Allocation {
+  description: string;
+}
+
+function groupAllocations(allocations: Allocation[], lineItems: LineItem[]) {
+  const grouped: Record<string, AllocationWithDescription[]> = {};
   
   allocations.forEach(alloc => {
     const item = lineItems.find(li => li.id === alloc.lineItemId);

@@ -162,6 +162,7 @@ export function EstimateProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useEstimate() {
   const context = useContext(EstimateContext);
   if (context === undefined) {

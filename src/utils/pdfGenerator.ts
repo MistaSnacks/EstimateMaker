@@ -1,10 +1,20 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import type { Estimate } from '../types/estimate';
+import type { Estimate, Allocation, LineItem } from '../types/estimate';
 import { calculateGrandTotal } from './calculations';
 
+interface AllocationWithDescription extends Allocation {
+  description: string;
+}
+
+interface jsPDFWithAutoTable extends jsPDF {
+  lastAutoTable?: {
+    finalY: number;
+  };
+}
+
 export async function generatePDF(estimate: Estimate): Promise<void> {
-  const doc = new jsPDF();
+  const doc = new jsPDF() as jsPDFWithAutoTable;
   
   const pageWidth = doc.internal.pageSize.getWidth();
   const margin = 15;
@@ -74,7 +84,7 @@ export async function generatePDF(estimate: Estimate): Promise<void> {
     headStyles: { fillColor: [200, 200, 200], textColor: [0, 0, 0] },
   });
 
-  yPos = (doc as any).lastAutoTable.finalY + 10;
+  yPos = doc.lastAutoTable?.finalY ? doc.lastAutoTable.finalY + 10 : yPos + 10;
 
   // Grand Total
   const grandTotal = calculateGrandTotal(estimate.lineItems);
@@ -117,7 +127,7 @@ export async function generatePDF(estimate: Estimate): Promise<void> {
         margin: { left: 15 },
       });
 
-      yPos = (doc as any).lastAutoTable.finalY + 10;
+      yPos = doc.lastAutoTable?.finalY ? doc.lastAutoTable.finalY + 10 : yPos + 10;
     }
   }
 
@@ -165,8 +175,8 @@ export async function generatePDF(estimate: Estimate): Promise<void> {
   doc.save(`${estimate.projectName.replace(/\s+/g, '_')}_Estimate.pdf`);
 }
 
-function groupAllocations(allocations: any[], lineItems: any[]) {
-  const grouped: Record<string, any[]> = {};
+function groupAllocations(allocations: Allocation[], lineItems: LineItem[]) {
+  const grouped: Record<string, AllocationWithDescription[]> = {};
   
   allocations.forEach(alloc => {
     const item = lineItems.find(li => li.id === alloc.lineItemId);
